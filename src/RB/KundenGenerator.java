@@ -17,7 +17,7 @@ public class KundenGenerator extends Observable {
 	 */
 	public KundenGenerator(){
 		super();
-		kdNr = 0;
+		kdNr = 1;
 	}  
 	
 	/**
@@ -36,11 +36,11 @@ public class KundenGenerator extends Observable {
 			customer.setKdNr(kdNr++);
 			customer.setMenge(tmp);
 			queue.add(customer);
-			System.out.println("  "+ customer.getKdNr());
-			setChanged();
-			notifyObservers();
+			System.out.println("  Neuer Kunde Nr: "+ customer.getKdNr());
+			
 		}
-
+		setChanged();
+		notifyObservers();
 	}
 
 }
