@@ -123,12 +123,12 @@ public class View extends Application {
 				waiter.setLabel(titel18, 10);
 
 				// Button
-				Button cancel = new Button(" Fenster schliessen ");
+				Button cancel = new Button(" Schliessen ");
 				cancel.setOnAction(new EventHandler<ActionEvent>() {
 					@Override
-					public void handle(ActionEvent event) {
-						
-						primaryStage.close();
+					public void handle(ActionEvent event) {					
+						primaryStage.close(); // Fenster Schliessen
+						System.exit(0); // Programm beenden
 					}
 
 				});
