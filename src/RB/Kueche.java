@@ -1,13 +1,26 @@
 package RB;
 
 import java.util.LinkedList;
-import java.util.Observable;
 import java.util.Queue;
 
 import javafx.application.Platform;
 import javafx.concurrent.Task;
 
-public class Kueche extends Observable {
+/**
+ * @author Mihail Weiland (mihail.weiland@haw-hamburg.de) <br>
+ * @author Edmund Schauer (edmund.schauer@haw-hamburg.de) <br>
+ * 
+ * @version 1.0<br>
+ * 
+ *          Praktikum Rechnernetze und Betriebssysteme, SS2015WI <br>
+ *          Praktikumsgruppe 4 <br>
+ *          Aufgabe 2 - "Fastfood"<br>
+ *          Verwendete Quellen: Skript, 
+ *          
+ * @description Die Klasse Kueche ist fuer die Produktion und Bereitstellung
+ * 			der Burger verantwortlich. 
+ */
+public class Kueche{
 	
 	private Queue<Integer> fertigeBurger; // Laufband
 	private int burgerCounter; // um die Burger durch zu numerieren
@@ -15,17 +28,16 @@ public class Kueche extends Observable {
 	private int [] burgerProAushilfe;
 	
 	/**
-	 * Konstruktor
+	 * Konstruktor Die ersten Initialisierungen.
 	 */
 	public Kueche(){
-		super();
 		this.offeneBestellungen = 0;
 		this.fertigeBurger = new LinkedList<Integer>();
-		this.burgerCounter = 0;
-		this.produziereBurger(1);
-		this.produziereBurger(2);
-		this.produziereBurger(3);
-		this.burgerProAushilfe = new int [3];
+		this.burgerCounter = 1;
+		this.produziereBurger(1); // Aushilfe 1 als Thread starten
+		this.produziereBurger(2); // Aushilfe 2 als Thread starten
+		this.produziereBurger(3); // Aushilfe 3 als Thread starten
+		this.burgerProAushilfe = new int [3]; // zur Kontrolle: welche AH wieviel gemacht hat
 	}	
 
 	/**
@@ -33,56 +45,56 @@ public class Kueche extends Observable {
 	 */
 	public synchronized void setOffeneBestellungen(int bestellung) {
 		this.offeneBestellungen += bestellung;
-		setChanged();
-		notifyObservers(getFertigeBurgerGesamt());
+		notifyAll();
 	}
 	
 	/**
 	 * @return the offeneBestellungen
 	 */
 	public synchronized int getOffeneBestellungen() {
+		notifyAll();
 		return offeneBestellungen;
 	}
 	
 	/**
 	 * @return the fertigeBurger
 	 */
-	public Queue<Integer> getFertigeBurger() {
-		return fertigeBurger;
-	}
-	
-	/**
-	 * @return the fertigeBurger
-	 */
 	public synchronized int getFertigeBurgerGesamt() {
+		notifyAll();
 		return fertigeBurger.size();
 	}
 	
-	public int getBurgerProAushilfe(int ahNr){
+	public synchronized int getBurgerProAushilfe(int ahNr){
+		notifyAll();
 		return this.burgerProAushilfe[ahNr];
 	}
 	
 	public synchronized void setFertigeBurger(){
-		fertigeBurger.add(burgerCounter++);
+		int burger = burgerCounter++;
+		fertigeBurger.add(burger);
+		System.out.println("+++Burger Nr. " + burger + " wurde erstellt");
 		if(getOffeneBestellungen() > 0)
 			offeneBestellungen--;
-		setChanged();
-		notifyObservers(getFertigeBurgerGesamt());
+		notifyAll();
 	}
 	
 	/**
 	 * @param Anzahl Burger
 	 * Burger vom Laufband entnehmen
 	 */
-	public void burgerEntnehmen(int burgerAnzahl){
+	public synchronized void burgerEntnehmen(int burgerAnzahl){
+		int burger = 0;
 		for(int i = 0; i < burgerAnzahl; i++){
-			fertigeBurger.poll();			
+			burger = fertigeBurger.poll();	
+			System.out.println("---Burger Nr. " + burger + " wurde verkauft");
 		}
-		setChanged();
-		notifyObservers(getFertigeBurgerGesamt());
+		notifyAll();
 	}
 
-	
+	/**
+	 * Die Methode wird parallel von 3 Aushilfen ausgefuert
+	 * @param aushilfeNr
+	 */
 	public void produziereBurger(final int aushilfeNr){
 		Task<Boolean> task = new Task<Boolean>() {
 
@@ -97,14 +109,18 @@ public class Kueche extends Observable {
 					Platform.runLater(new Runnable() {
 						@Override
 						public void run() {
-							
+							// Regel 1) maximal 12 Burger mit Bestellung 
+							// Regel 2) oder 5 ohne. 
+							// Mindestens 2 Burger ohne Bestellung wird mit der 2. Regel abgegolten
 							if((getOffeneBestellungen() > 0 && getFertigeBurgerGesamt() < 12) || 
 									(getOffeneBestellungen() == 0 && getFertigeBurgerGesamt() < 5)){
-								// produzieren
+								
 								burgerProAushilfe[aushilfeNr-1]++;
-								setFertigeBurger();
 								
-								
+								setFertigeBurger();	// produzieren						
+							} else {
+								getOffeneBestellungen(); // einfach um ein notifyAll() aufzurufen, 
+														//	damit Burger vom Laufband genommen werden
 							}
 
 						}

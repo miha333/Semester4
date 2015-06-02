@@ -1,15 +1,28 @@
 package RB;
 
+/**
+ * @author Mihail Weiland (mihail.weiland@haw-hamburg.de) <br>
+ * @author Edmund Schauer (edmund.schauer@haw-hamburg.de) <br>
+ * 
+ * @version 1.0<br>
+ * 
+ *          Praktikum Rechnernetze und Betriebssysteme, SS2015WI <br>
+ *          Praktikumsgruppe 4 <br>
+ *          Aufgabe 2 - "Fastfood"<br>
+ *          Verwendete Quellen: Skript, 
+ *          
+ * @description Die Klasse Kunde haelt Kundeneigenschaften fest.
+ */
 public class Kunde {
-	private int menge;
-	private int kdNr;
-	private boolean bestellt;
-	private boolean bezahlt;
-	private boolean bekommen;
-	private long bestellZeit;
+	private int menge; // die Bestellmenge (1-8) wird zufaellig bei Erstellung vergeben
+	private int kdNr; // die Kundennummer wird bei Erstellung inkrementiert
+	private boolean bestellt; // flag
+	private boolean bezahlt; // flag
+	private boolean bekommen; // flag
+	private long bestellZeit; // um Prioritaet in der Warteschlange zu ermitteln
 	
 	/**
-	 * Default Konstruktor
+	 *  Konstruktor Die ersten Initialisierungen.
 	 */
 	public Kunde(){
 		this.menge = 0;

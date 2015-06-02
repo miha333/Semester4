@@ -5,31 +5,48 @@ import java.util.List;
 import java.util.Observable;
 
 /**
- * @author Papa
- *
+ * @author Mihail Weiland (mihail.weiland@haw-hamburg.de) <br>
+ * @author Edmund Schauer (edmund.schauer@haw-hamburg.de) <br>
+ * 
+ * @version 1.0<br>
+ * 
+ *          Praktikum Rechnernetze und Betriebssysteme, SS2015WI <br>
+ *          Praktikumsgruppe 4 <br>
+ *          Aufgabe 2 - "Fastfood"<br>
+ *          Verwendete Quellen: Skript, 
+ *          
+ * @description Die Klasse KundenGenerator produziert eine Reihe von Kunden.
+ * 			Die Anzahl der Kunden wird von der Klasse View bestimmt. 
+ * 			Als Observable wird KundenGenerator von der Klasse
+ * 			ServiceKraft beobachtet.
  */
 public class KundenGenerator extends Observable {
-	private List<Kunde> queue = new LinkedList<Kunde>();
+	private List<Kunde> queue; 
 	private int kdNr;
-	
+
 	/**
-	 * Konstruktor
+	 * Konstruktor. Die ersten Initialisierungen.
 	 */
 	public KundenGenerator(){
 		super();
-		kdNr = 1;
+		this.queue = new LinkedList<Kunde>();
+		this.kdNr = 1;
 	}  
-	
+
 	/**
-	 * @return the queue
+	 * @return eine Liste mit den Kunden
 	 */
 	public List<Kunde> getQueue() {
 		return queue;
 	}
 
+	/**
+	 * @param Anzahl der Kunden, die erzeugt werden muss
+	 */
 	public void esWerdeKunde(int kunden) {
 		if(this.queue.size() > 0)
-			this.queue.clear();
+			this.queue.clear(); // Die Liste ist temporaer.
+		
 		for(int i = 0; i < kunden; i++){
 			Kunde customer = new Kunde();
 			int tmp = (int)(Math.random()*8+1);
@@ -40,7 +57,7 @@ public class KundenGenerator extends Observable {
 			
 		}
 		setChanged();
-		notifyObservers();
+		notifyObservers(true);
 	}
 
 }
